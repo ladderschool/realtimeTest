@@ -5,7 +5,7 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
-import { NewNotificationChannelType } from 'src/subscriptions/newNotification'
+import { PubSubContext } from 'src/subscriptions/newNotification'
 
 export const points: QueryResolvers['points'] = () => {
   return db.point.findMany()
@@ -19,14 +19,16 @@ export const point: QueryResolvers['point'] = ({ id }) => {
 
 export const createPoint: MutationResolvers['createPoint'] = async (
   { input },
-  { context }: { context: { pubSub: NewNotificationChannelType } }
+  { context }
 ) => {
+  const { pubSub, currentUser } = context as PubSubContext
+
   const point = await db.point.create({
     data: input,
   })
 
   // Publish a notification to the user
-  context.pubSub.publish('newNotification', context.currentUser.id, {
+  pubSub.publish('newNotification', currentUser.id, {
     type: 'points',
     message: `You increased your points by ${input.amount} points`,
     createdAt: new Date(),

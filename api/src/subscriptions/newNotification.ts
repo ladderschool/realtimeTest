@@ -1,9 +1,17 @@
+import { PrismaClient } from '@prisma/client'
 import gql from 'graphql-tag'
 import type { Notification } from 'types/graphql'
 
+import { RedwoodGraphQLContext } from '@redwoodjs/graphql-server'
 import type { PubSub } from '@redwoodjs/realtime'
 
 import { logger } from 'src/lib/logger'
+
+import type {
+  Overwrite,
+  InferredCurrentUser,
+  UndefinedRoles,
+} from '../../../.redwood/types/includes/all-currentUser'
 
 export const schema = gql`
   type Notification {
@@ -17,18 +25,22 @@ export const schema = gql`
   }
 `
 
-export type NewNotificationChannel = {
+type NewNotificationChannel = {
   newNotification: [userId: number, payload: Notification]
 }
 
-export type NewNotificationChannelType = PubSub<NewNotificationChannel>
+export interface PubSubContext extends RedwoodGraphQLContext {
+  pubSub: PubSub<NewNotificationChannel>
+  currentUser: Overwrite<UndefinedRoles, InferredCurrentUser>
+  db: PrismaClient
+}
 
 const resolvers = {
   newNotification: {
     subscribe: (
       _,
       { userId },
-      { pubSub }: { pubSub: NewNotificationChannelType }
+      { pubSub }: { pubSub: PubSubContext['pubSub'] }
     ) => {
       // Ensure the user can only subscribe to their own notifications
       if (context.currentUser.id !== userId) {

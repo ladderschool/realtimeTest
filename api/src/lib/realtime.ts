@@ -1,30 +1,6 @@
-import Redis from 'ioredis'
-
 import { RedwoodRealtimeOptions } from '@redwoodjs/realtime'
 
 import subscriptions from 'src/subscriptions/**/*.{js,ts}'
-
-import { logger } from './logger'
-
-const publishClient = new Redis(process.env.REDIS_URL, {
-  maxRetriesPerRequest: 2,
-  db: 1,
-})
-const subscribeClient = new Redis(process.env.REDIS_URL, {
-  maxRetriesPerRequest: 2,
-  db: 1,
-})
-
-// Test Redis connection
-publishClient.on('connect', () => {
-  logger.warn('Redis publish client connected')
-})
-publishClient.on('error', (err) => {
-  logger.warn('Redis publish client error', err)
-})
-publishClient.on('message', (msg) => {
-  logger.warn('Redis publish message', msg)
-})
 
 /**
  * Configure RedwoodJS Realtime
@@ -51,9 +27,9 @@ publishClient.on('message', (msg) => {
 export const realtime: RedwoodRealtimeOptions = {
   subscriptions: {
     subscriptions,
-    //store: 'in-memory',
+    store: 'in-memory',
     // if using a Redis store
-    store: { redis: { publishClient, subscribeClient } },
+    //store: { redis: { publishClient, subscribeClient } },
   },
   liveQueries: {
     store: 'in-memory',
