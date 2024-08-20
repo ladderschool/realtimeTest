@@ -1,0 +1,13 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@redwoodjs/api": "8.0.0-rc.1279",
+    "@redwoodjs/api-server": "8.0.0-rc.1279+7142bee30",
+    "@redwoodjs/auth-dbauth-api": "8.0.0-rc.1279+7142bee30",
+    "@redwoodjs/graphql-server": "8.0.0-rc.1279",
+    "@redwoodjs/realtime": "8.0.0-rc.1279+7142bee30",
+    "ioredis": "^5"
+  }
+}
